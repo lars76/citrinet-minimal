@@ -1,0 +1,19 @@
+name: nemo
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/torch/hub/checkpoints
+          key: citrinet-checkpoints-v1
+      - run: uv venv
+      - run: uv pip install --index-strategy unsafe-best-match --extra-index-url https://download.pytorch.org/whl/cpu "torch==2.8.*" "torchaudio==2.8.*" "nemo_toolkit[asr]==2.4.*" "pyarrow<20" soundfile soxr pytest
+      - run: uv run pytest -q -rs
